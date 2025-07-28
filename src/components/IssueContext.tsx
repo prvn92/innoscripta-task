@@ -11,6 +11,7 @@ const IssueContext = createContext<IssueContextType>({
   issues: [],
   fetchIssues: () => {},
   setIssues: () => {},
+  setRecent: () => {},
 });
 
 export function IssueProvider({ children }: { children: React.ReactNode }) {
@@ -21,7 +22,10 @@ export function IssueProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initialIssues = getAllIssues();
     setIssues(initialIssues);
-    setOldIssues(null);
+    const storedRecent = localStorage.getItem('recentIssues');
+    if (storedRecent) {
+      setRecent(JSON.parse(storedRecent));
+    }
   }, []);
 
   const updateIssue = ( newIssues?: Issue[]) => {
@@ -37,7 +41,9 @@ export function IssueProvider({ children }: { children: React.ReactNode }) {
   };
 
   const onIssueClick = (id: string) => {
-    setRecent(prev => [id, ...prev.filter(rid => rid !== id)].slice(0, 5));
+    const updatedRecent = [id, ...recent.filter(rid => rid !== id)].slice(0, 5);
+    setRecent(updatedRecent);
+    localStorage.setItem('recentIssues', JSON.stringify(updatedRecent));
   };
 
   const fetchIssues = () => {
@@ -45,7 +51,7 @@ export function IssueProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <IssueContext.Provider value={{ recent, updateIssue, undo, onIssueClick, issues, fetchIssues, setIssues }}>
+    <IssueContext.Provider value={{ recent, updateIssue, undo, onIssueClick, issues, fetchIssues, setIssues, setRecent }}>
       {children}
     </IssueContext.Provider>
   );

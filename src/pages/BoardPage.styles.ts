@@ -61,3 +61,10 @@ export const paginationButtonStyle: React.CSSProperties = {
   background: '#f7f7f7',
   cursor: 'pointer',
 };
+
+export const boardContainerStyle = { display: 'flex', gap: 24, marginTop: 24 };
+export const columnsWrapperStyle = { flex: 1, display: 'flex', gap: 24 };
+export const sidebarStyle = { width: 300, minWidth: 220, borderLeft: '1px solid #eee', paddingLeft: 24 };
+export const paginationContainerStyle = { display: 'flex', justifyContent: 'center', marginTop: 24, gap: 16 };
+export const pageLabelStyle = { fontSize: 16, fontWeight: 500 };
+export const rootStyle = { padding: '1rem' };

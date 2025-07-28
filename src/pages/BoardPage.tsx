@@ -10,7 +10,13 @@ import {
   issueCardStyle,
   undoToastStyle,
   undoButtonStyle,
-  paginationButtonStyle
+  paginationButtonStyle,
+  boardContainerStyle,
+  columnsWrapperStyle,
+  sidebarStyle,
+  paginationContainerStyle,
+  pageLabelStyle,
+  rootStyle
 } from './BoardPage.styles';
 import { useNavigate } from 'react-router-dom';
 
@@ -100,7 +106,7 @@ export const BoardPage = () => {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div style={rootStyle}>
       <h2>Issue Board</h2>
       <IssueFilters
         search={search}
@@ -116,45 +122,50 @@ export const BoardPage = () => {
           Issue update: <button onClick={(e) => handleUndo(e)} style={undoButtonStyle}>Undo</button>
         </div>
       )}
-      <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
-        {STATUS_COLUMNS.map((status) => {
-          const sorted = paginatedIssues.filter((issue: Issue) => issue.status === status);
-          return (
-            <div
-              key={status}
-              style={boardColumnStyle}
-              onDragOver={(e) => {
-                e.preventDefault();
-                const index = Math.floor(
-                  (e.nativeEvent.offsetY / e.currentTarget.offsetHeight) * sorted.length
-                );
-                onDragOver(status, index);
-              }}
-              onDrop={() => onDrop(status)}
-            >
-              <h3>{status}</h3>
-              {sorted.map((issue: Issue, idx: number) => (
-                <div
-                  key={issue.id}
-                  draggable
-                  onDragStart={() => onDragStart(issue.id)}
-                  onDragEnd={onDragEnd}
-                  onClick={() => handleIssueClick(issue.id)}
-                  style={issueCardStyle(draggedId, dragOverIndex === idx ? issue.id : null, issue.id)}
-                >
-                  <IssueCard
-                    id={issue.id}
-                    title={issue.title}
-                    priority={issue.priority}
-                    assignee={issue.assignee}
-                  />
-                </div>
-              ))}
-            </div>
-          );
-        })}
+      <div style={boardContainerStyle}>
+        <div style={columnsWrapperStyle}>
+          {STATUS_COLUMNS.map((status) => {
+            const sorted = paginatedIssues.filter((issue: Issue) => issue.status === status);
+            return (
+              <div
+                key={status}
+                style={boardColumnStyle}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  const index = Math.floor(
+                    (e.nativeEvent.offsetY / e.currentTarget.offsetHeight) * sorted.length
+                  );
+                  onDragOver(status, index);
+                }}
+                onDrop={() => onDrop(status)}
+              >
+                <h3>{status}</h3>
+                {sorted.map((issue: Issue, idx: number) => (
+                  <div
+                    key={issue.id}
+                    draggable
+                    onDragStart={() => onDragStart(issue.id)}
+                    onDragEnd={onDragEnd}
+                    onClick={() => handleIssueClick(issue.id)}
+                    style={issueCardStyle(draggedId, dragOverIndex === idx ? issue.id : null, issue.id)}
+                  >
+                    <IssueCard
+                      id={issue.id}
+                      title={issue.title}
+                      priority={issue.priority}
+                      assignee={issue.assignee}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+        <div style={sidebarStyle}>
+          <RecentIssues recent={recent} />
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24, gap: 16 }}>
+      <div style={paginationContainerStyle}>
         <button
           style={paginationButtonStyle}
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
@@ -162,7 +173,7 @@ export const BoardPage = () => {
         >
           Previous
         </button>
-        <span style={{ fontSize: 16, fontWeight: 500 }}>Page {page}</span>
+        <span style={pageLabelStyle}>Page {page}</span>
         <button
           style={paginationButtonStyle}
           onClick={() => setPage((prev) => prev + 1)}
@@ -171,7 +182,6 @@ export const BoardPage = () => {
           Next
         </button>
       </div>
-      <RecentIssues recent={recent} />
     </div>
   );
 };

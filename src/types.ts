@@ -24,4 +24,5 @@ export interface IssueContextType {
   issues: Issue[];
   fetchIssues: () => void;
   setIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
+  setRecent: React.Dispatch<React.SetStateAction<string[]>>;
 }

@@ -37,13 +37,10 @@ export const BoardPage = () => {
   const PAGE_SIZE = 25;
   const assignees = Array.from(new Set(issues.map(issue => issue.assignee))).filter(Boolean);
   const offset = (page - 1) * PAGE_SIZE;
-  const boardIssues = useMemo(() =>
-    getFilteredIssues({ search, assignee: assigneeFilter, severity: severityFilter }, PAGE_SIZE, offset, issues),
+  const { issues: paginatedIssues, totalRecords } = useMemo(
+    () => getFilteredIssues({ search, assignee: assigneeFilter, severity: severityFilter }, PAGE_SIZE, offset, issues),
     [search, assigneeFilter, severityFilter, PAGE_SIZE, offset, issues]
   );
-  const totalRecords = boardIssues.length;
-
-
 
   const showUndoToastWithTimeout = () => {
     setShowUndoToast(true);
@@ -121,7 +118,7 @@ export const BoardPage = () => {
       )}
       <div style={{ display: 'flex', gap: 24, marginTop: 24 }}>
         {STATUS_COLUMNS.map((status) => {
-          const sorted = boardIssues.filter((issue: Issue) => issue.status === status);
+          const sorted = paginatedIssues.filter((issue: Issue) => issue.status === status);
           return (
             <div
               key={status}

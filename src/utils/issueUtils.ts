@@ -78,8 +78,7 @@ export function getFilteredIssues(
   pageSize: number = 25,
   offset: number = 0,
   issues: Issue[]
-): Issue[] {
-
+): { issues: Issue[]; totalRecords: number } {
   let filtered = issues;
   if (filters.search) {
     const searchText = String(filters.search).toLowerCase();
@@ -91,7 +90,8 @@ export function getFilteredIssues(
   if (filters.severity) {
     filtered = filtered.filter(issue => String(issue.severity) === String(filters.severity));
   }
-  return filtered.slice(offset, offset + pageSize);
+  const totalRecords = filtered.length;
+  return { issues: filtered.slice(offset, offset + pageSize), totalRecords };
 }
 
 export function getAssignees(): string[] {

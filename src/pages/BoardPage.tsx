@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Issue, IssueStatus } from '../types';
 import { IssueCard } from '../components/IssueCard';
 import { IssueProvider, useIssueContext } from '../components/IssueContext';
@@ -19,6 +19,7 @@ import {
   rootStyle
 } from './BoardPage.styles';
 import { useNavigate } from 'react-router-dom';
+import { mockFetchIssues } from '../utils/api';
 
 const STATUS_COLUMNS: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
 
@@ -38,6 +39,7 @@ export const BoardPage = () => {
   const [showUndoToast, setShowUndoToast] = useState(false);
   const [page, setPage] = useState(1);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
   const undoTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
@@ -48,6 +50,18 @@ export const BoardPage = () => {
     () => getFilteredIssues({ search, assignee: assigneeFilter, severity: severityFilter }, PAGE_SIZE, offset, issues),
     [search, assigneeFilter, severityFilter, PAGE_SIZE, offset, issues]
   );
+
+  useEffect(() => {
+    const poll = async () => {
+      const data = await mockFetchIssues();
+      // TODO: Once BE is ready, update the issues state here with the fetched data.
+      // This is for simulating polling only; currently, we only update lastSync.
+      setLastSync(new Date());
+    };
+    poll();
+    const interval = setInterval(poll, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const showUndoToastWithTimeout = () => {
     setShowUndoToast(true);
@@ -111,6 +125,9 @@ export const BoardPage = () => {
   return (
     <div style={rootStyle}>
       <h2>Issue Board</h2>
+      <div style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
+        Last sync: {lastSync ? lastSync.toLocaleTimeString() : 'Never'}
+      </div>
       {user.role === 'contributor' && (
         <div style={{ color: '#e67e22', marginBottom: 12, fontWeight: 500 }}>Read-only: Contributors cannot move or update issues.</div>
       )}

@@ -29,6 +29,7 @@ export const BoardPage = () => {
     updateIssue,
     undo,
     onIssueClick,
+    user
   } = useIssueContext();
   const [search, setSearch] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -56,7 +57,7 @@ export const BoardPage = () => {
     }, 5000);
   };
   const onDrop = (status: IssueStatus) => {
-    if (!draggedId) return;
+    if (!draggedId || user.role !== 'admin') return;
     const draggedIndex = issues.findIndex(issue => issue.id === draggedId);
     if (draggedIndex === -1) return;
     const updatedIssue = { ...issues[draggedIndex], status, updatedAt: new Date().toISOString() };
@@ -96,18 +97,23 @@ export const BoardPage = () => {
     if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
   };
 
-  const onDragStart = (id: string) => setDraggedId(id);
+  const onDragStart = (id: string) => { if (user.role === 'admin') setDraggedId(id); };
   const onDragOver = (_columnStatus: IssueStatus, index: number) => {
-    setDragOverIndex(index);
+    if (user.role === 'admin') setDragOverIndex(index);
   };
   const onDragEnd = () => {
-    setDraggedId(null);
-    setDragOverIndex(null);
+    if (user.role === 'admin') {
+      setDraggedId(null);
+      setDragOverIndex(null);
+    }
   };
 
   return (
     <div style={rootStyle}>
       <h2>Issue Board</h2>
+      {user.role === 'contributor' && (
+        <div style={{ color: '#e67e22', marginBottom: 12, fontWeight: 500 }}>Read-only: Contributors cannot move or update issues.</div>
+      )}
       <IssueFilters
         search={search}
         onSearchChange={handleSearch}
@@ -143,9 +149,9 @@ export const BoardPage = () => {
                 {sorted.map((issue: Issue, idx: number) => (
                   <div
                     key={issue.id}
-                    draggable
-                    onDragStart={() => onDragStart(issue.id)}
-                    onDragEnd={onDragEnd}
+                    draggable={user.role === 'admin'}
+                    onDragStart={user.role === 'admin' ? () => onDragStart(issue.id) : undefined}
+                    onDragEnd={user.role === 'admin' ? onDragEnd : undefined}
                     onClick={() => handleIssueClick(issue.id)}
                     style={issueCardStyle(draggedId, dragOverIndex === idx ? issue.id : null, issue.id)}
                   >

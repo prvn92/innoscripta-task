@@ -2,8 +2,29 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Issue } from '../types';
 import { getAllIssues } from '../utils/issueUtils';
 import { IssueContextType } from '../types';
+import { currentUser as importedCurrentUser } from '../constants/currentUser';
 
-const IssueContext = createContext<IssueContextType>({
+export interface User {
+  name: string;
+  role: 'admin' | 'contributor';
+}
+
+const getInitialRole = () => {
+  const stored = localStorage.getItem('userRole');
+  if (stored === 'admin' || stored === 'contributor') return stored;
+  return importedCurrentUser.role;
+};
+
+const currentUser: User = {
+  name: importedCurrentUser.name,
+  role: getInitialRole() as 'admin' | 'contributor',
+};
+
+interface IssueContextWithUser extends IssueContextType {
+  user: User;
+}
+
+const IssueContext = createContext<IssueContextWithUser>({
   recent: [],
   updateIssue: () => {},
   undo: () => {},
@@ -12,6 +33,7 @@ const IssueContext = createContext<IssueContextType>({
   fetchIssues: () => {},
   setIssues: () => {},
   setRecent: () => {},
+  user: currentUser,
 });
 
 export function IssueProvider({ children }: { children: React.ReactNode }) {
@@ -51,7 +73,7 @@ export function IssueProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <IssueContext.Provider value={{ recent, updateIssue, undo, onIssueClick, issues, fetchIssues, setIssues, setRecent }}>
+    <IssueContext.Provider value={{ recent, updateIssue, undo, onIssueClick, issues, fetchIssues, setIssues, setRecent, user: currentUser }}>
       {children}
     </IssueContext.Provider>
   );

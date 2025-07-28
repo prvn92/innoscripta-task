@@ -6,7 +6,7 @@ import { IssueStatus } from '../types';
 
 export const IssueDetailPage = () => {
   const { id } = useParams();
-  const { issues, updateIssue } = useIssueContext();
+  const { issues, updateIssue, user } = useIssueContext();
   const issue = issues.find(i => i.id === id);
 
   if (!issue) {
@@ -24,6 +24,9 @@ export const IssueDetailPage = () => {
   return (
     <div style={containerStyle}>
       <h2>Issue Details</h2>
+      {user.role === 'contributor' && (
+        <div style={{ color: '#e67e22', marginBottom: 12, fontWeight: 500 }}>Read-only: Contributors cannot mark issues as resolved.</div>
+      )}
       <div style={fieldStyle}><strong>ID:</strong> {issue.id}</div>
       <div style={fieldStyle}><strong>Title:</strong> {issue.title}</div>
       <div style={fieldStyle}><strong>Description:</strong> {issue.description || 'No description provided.'}</div>
@@ -33,7 +36,7 @@ export const IssueDetailPage = () => {
       <div style={fieldStyle}><strong>Severity:</strong> {issue.severity}</div>
       <div style={fieldStyle}><strong>Created:</strong> {issue.createdAt || '-'}</div>
       <div style={fieldStyle}><strong>Updated:</strong> {issue.updatedAt || '-'}</div>
-      {issue.status !== 'Done' && (
+      {issue.status !== 'Done' && user.role === 'admin' && (
         <button onClick={handleMarkAsResolved} style={{ marginTop: 24, padding: '8px 20px', background: '#2ecc40', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 500, fontSize: 16, cursor: 'pointer' }}>
           Mark as Resolved
         </button>

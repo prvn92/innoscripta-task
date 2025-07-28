@@ -124,7 +124,7 @@ export const BoardPage = () => {
 
   return (
     <div style={rootStyle}>
-      <h2>Issue Board</h2>
+      <h2>Kanban Board</h2>
       <div style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
         Last sync: {lastSync ? lastSync.toLocaleTimeString() : 'Never'}
       </div>

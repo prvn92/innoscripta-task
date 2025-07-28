@@ -1,5 +1,4 @@
 import React from 'react';
-import { IssueStatus } from '../types';
 
 export const boardColumnStyle: React.CSSProperties = {
   flex: 1,
